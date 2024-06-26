@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { config } from "./config/config";
 import connectDb from "./config/db";
 import userRegistrationRouter from "./routes/userRegistrationRouter";
+import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 const app = express();
 const port = config.port;
@@ -28,5 +29,8 @@ app.get("/", (req, res) => {
 
 //user registration
 app.use("/api/user", userRegistrationRouter);
+
+//handling error
+app.use(globalErrorHandler);
 
 startServer();
