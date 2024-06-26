@@ -1,5 +1,5 @@
 export interface userModelTypes {
-  fisrtName: string;
+  firstName: string;
   lastName: string;
   email: string;
   mobile: string;

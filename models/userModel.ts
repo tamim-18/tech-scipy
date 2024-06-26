@@ -4,7 +4,7 @@ import { userModelTypes } from "../types/userModelTypes";
 // Declare the Schema of the Mongo model
 const userSchema = new mongoose.Schema<userModelTypes>(
   {
-    fisrtName: {
+    firstName: {
       type: String,
       required: true,
     },
@@ -34,4 +34,4 @@ const userSchema = new mongoose.Schema<userModelTypes>(
 );
 
 //Export the model
-module.exports = mongoose.model("User", userSchema);
+export default mongoose.model<userModelTypes>("User", userSchema);

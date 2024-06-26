@@ -6,6 +6,7 @@ dotenv(); // loading the environment variables
 const _cofig = {
   port: env.PORT || 3000,
   dburl: env.MONGO_URI,
+  env: env.NODE_ENV,
 };
 
 // freezing
