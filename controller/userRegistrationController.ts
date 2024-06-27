@@ -44,17 +44,18 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     return next(createHttpError(500, "Something went wrong"));
   }
-  //send response
-  res.status(201).json({
-    message: "User created successfully",
-    data: {
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      email: newUser.email,
-      mobile: newUser.mobile,
-      password: newUser.password,
-    },
-  });
+  // token generation using jwt
+  // jwt.sign({payload}, secret, {options})
+  // options: expiresIn, algorithm, issuer, audience
+  const token = sign(
+    //@ts-ignore
+    { id: newUser._id },
+    config.jwtSecret as string,
+    {
+      expiresIn: "7d",
+    }
+  );
+  res.status(201).json({ accessToken: token });
 };
 
 // user login
@@ -68,24 +69,25 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
   //check if user exists
   try {
     const user = await userModel.findOne({ email });
+    // console.log(user);
     if (!user) {
       return next(createHttpError(401, "Invalid credentials"));
     }
     //check if password is correct
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return next(createHttpError(401, "Invalid credentials"));
     }
+
     //toker generation using jwt
     const token = sign({ sub: user._id }, config.jwtSecret as string, {
       expiresIn: "7d",
     });
     //send response
-    res.status(201).json({ accessToken: token });
+    res.status(200).json({ accessToken: token });
   } catch (err) {
     return next(createHttpError(404, "User not found"));
   }
-  res.status(201).json({ message: "User logged in successfully" });
 };
 
 export { createUser, userLogin };
