@@ -7,6 +7,7 @@ const _cofig = {
   port: env.PORT || 3000,
   dburl: env.MONGO_URI,
   env: env.NODE_ENV,
+  jwtSecret: env.JWT_SECRET_KEY,
 };
 
 // freezing

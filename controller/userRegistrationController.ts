@@ -5,6 +5,9 @@ import userModel from "../models/userModel";
 import createHttpError from "http-errors";
 import { userModelTypes } from "../types/userModelTypes";
 import bcrypt from "bcrypt";
+import { sign } from "jsonwebtoken";
+
+import { config } from "../config/config";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //if user already exists
@@ -54,4 +57,35 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-export { createUser };
+// user login
+
+const userLogin = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+  //validate user
+  if (!email || !password) {
+    return next(createHttpError(400, "Please provide email and password"));
+  }
+  //check if user exists
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return next(createHttpError(401, "Invalid credentials"));
+    }
+    //check if password is correct
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return next(createHttpError(401, "Invalid credentials"));
+    }
+    //toker generation using jwt
+    const token = sign({ sub: user._id }, config.jwtSecret as string, {
+      expiresIn: "7d",
+    });
+    //send response
+    res.status(201).json({ accessToken: token });
+  } catch (err) {
+    return next(createHttpError(404, "User not found"));
+  }
+  res.status(201).json({ message: "User logged in successfully" });
+};
+
+export { createUser, userLogin };
