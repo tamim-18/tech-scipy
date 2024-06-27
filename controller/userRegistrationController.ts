@@ -115,4 +115,16 @@ const getSingleUser = async (
   }
 };
 
-export { createUser, userLogin, getAllUsers, getSingleUser };
+// delete a user
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await userModel.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "User deleted" });
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
+//update user
+
+export { createUser, userLogin, getAllUsers, getSingleUser, deleteUser };
