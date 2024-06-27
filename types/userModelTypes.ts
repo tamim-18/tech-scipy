@@ -4,4 +4,5 @@ export interface userModelTypes {
   email: string;
   mobile: string;
   password: string;
+  isAdmin?: string;
 }

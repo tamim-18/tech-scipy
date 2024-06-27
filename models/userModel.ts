@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema<userModelTypes>(
       type: String,
       required: true,
     },
+    isAdmin: {
+      type: String,
+      default: "user",
+    },
   },
   //timestamps
   {

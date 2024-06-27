@@ -49,7 +49,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   // options: expiresIn, algorithm, issuer, audience
   const token = sign(
     //@ts-ignore
-    { id: newUser._id },
+    { id: newUser?._id },
     config.jwtSecret as string,
     {
       expiresIn: "7d",
@@ -90,4 +90,29 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { createUser, userLogin };
+//getting all users
+
+const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const users = await userModel.find({});
+    res.status(200).json(users);
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
+//get single user
+const getSingleUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await userModel.findById(req.params.id);
+    res.status(200).json(user);
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
+export { createUser, userLogin, getAllUsers, getSingleUser };
