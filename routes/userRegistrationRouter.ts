@@ -9,14 +9,15 @@ import {
   updateUser,
   userLogin,
 } from "../controller/userRegistrationController";
-import { authentication } from "../middlewares/authenticate";
+import { authentication, isAdmin } from "../middlewares/authenticate";
 
 const userRouter = express.Router();
 
 userRouter.post("/register", createUser);
 userRouter.post("/login", userLogin);
 userRouter.get("/all-users", getAllUsers);
-userRouter.get("/:id", authentication, getSingleUser);
+//@ts-ignore
+userRouter.get("/:id", authentication, isAdmin, getSingleUser);
 userRouter.delete("/:id", deleteUser);
 userRouter.put("/:id", updateUser);
 
