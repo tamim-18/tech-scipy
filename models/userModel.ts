@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { userModelTypes } from "../types/userModelTypes";
+import { ObjectId } from "mongodb";
 
 // Declare the Schema of the Mongo model
 const userSchema = new mongoose.Schema<userModelTypes>(
@@ -30,6 +31,22 @@ const userSchema = new mongoose.Schema<userModelTypes>(
       type: String,
       default: "user",
     },
+    cart: {
+      type: Array,
+      default: [],
+    },
+    address: [
+      {
+        type: ObjectId,
+        ref: "Address",
+      },
+    ],
+    whistlist: [
+      {
+        type: ObjectId,
+        ref: "Product",
+      },
+    ],
   },
   //timestamps
   {

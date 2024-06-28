@@ -126,5 +126,30 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 //update user
+const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        firstName: req?.body?.firstName,
+        lastName: req?.body?.lastName,
+        email: req?.body?.email,
+        mobile: req?.body?.mobile,
+      },
+      { new: true }
+    );
 
-export { createUser, userLogin, getAllUsers, getSingleUser, deleteUser };
+    res.status(200).json(user);
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
+export {
+  createUser,
+  userLogin,
+  getAllUsers,
+  getSingleUser,
+  deleteUser,
+  updateUser,
+};
