@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema<userModelTypes>(
       required: true,
     },
     isAdmin: {
-      type: String,
-      default: "user",
+      type: Boolean,
+      default: false,
     },
     cart: {
       type: Array,
@@ -47,6 +47,10 @@ const userSchema = new mongoose.Schema<userModelTypes>(
         ref: "Product",
       },
     ],
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
   },
   //timestamps
   {

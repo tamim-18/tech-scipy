@@ -14,7 +14,7 @@ import { AuthRequest } from "../middlewares/authenticate";
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //if user already exists
 
-  const { email, mobile, password } = req.body;
+  const { email, mobile, password, isAdmin } = req.body;
   try {
     const userExists = await userModel.findOne({ email });
     if (userExists) {
@@ -42,6 +42,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
       email,
       mobile,
       password: hashedPassword,
+      isAdmin,
     });
   } catch (err) {
     return next(createHttpError(500, "Something went wrong"));
@@ -149,6 +150,41 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// block user.. only admin can block user
+
+const blockUser = async (req: Request, res: Response, next: NextFunction) => {
+  const _req = req as AuthRequest; // Typecasting the request to AuthRequest. why req as AuthRequest? because we need to access the userId from the request.
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        isBlocked: true,
+      },
+      { new: true }
+    );
+    res.status(200).json(user);
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
+// unblock user.. only admin can unblock user
+
+const unblockUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        isBlocked: false,
+      },
+      { new: true }
+    );
+    res.status(200).json(user);
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
 export {
   createUser,
   userLogin,
@@ -156,4 +192,6 @@ export {
   getSingleUser,
   deleteUser,
   updateUser,
+  blockUser,
+  unblockUser,
 };

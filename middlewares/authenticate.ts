@@ -33,10 +33,14 @@ const authentication = async (
   //   console.log(decoded);
   next(); // This is important. If you don't call next(), the request will hang.
 };
-const isAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await userModel.findById(req.userId);
-    if (user?.isAdmin === "admin") {
+    const _req = req as AuthRequest;
+    //console.log(_req.userId);
+    const user = await userModel.findById(_req.userId);
+    //console.log(user);
+    //console.log(user?.isAdmin);
+    if (user?.isAdmin) {
       return next(); // If the user is an admin, call the next middleware
     } else {
       return next(createHttpError(401, "Unauthorized"));

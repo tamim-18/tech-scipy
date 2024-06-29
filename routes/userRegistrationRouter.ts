@@ -2,10 +2,12 @@
 
 import express from "express";
 import {
+  blockUser,
   createUser,
   deleteUser,
   getAllUsers,
   getSingleUser,
+  unblockUser,
   updateUser,
   userLogin,
 } from "../controller/userRegistrationController";
@@ -20,5 +22,14 @@ userRouter.get("/all-users", getAllUsers);
 userRouter.get("/:id", authentication, isAdmin, getSingleUser);
 userRouter.delete("/:id", deleteUser);
 userRouter.put("/update-user", authentication, updateUser);
+//get admin
+//@ts-ignore
+userRouter.get("/admin", authentication, isAdmin);
+//block user
+//@ts-ignore
+userRouter.put("/block-user/:id", authentication, isAdmin, blockUser);
+//unblock user
+//@ts-ignore
+userRouter.put("/unblock-user/:id", authentication, isAdmin, unblockUser);
 
 export default userRouter;
