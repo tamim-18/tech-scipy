@@ -19,6 +19,6 @@ userRouter.get("/all-users", getAllUsers);
 //@ts-ignore
 userRouter.get("/:id", authentication, isAdmin, getSingleUser);
 userRouter.delete("/:id", deleteUser);
-userRouter.put("/:id", updateUser);
+userRouter.put("/update-user", authentication, updateUser);
 
 export default userRouter;

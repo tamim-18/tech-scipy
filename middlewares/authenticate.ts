@@ -23,7 +23,7 @@ const authentication = async (
   try {
     const parsedToken = token.split(" ")[1]; // This is because the token is in the format "Bearer token
     const decoded = jwt.verify(parsedToken, config.jwtSecret as string); // Verify the token
-    console.log(decoded.sub);
+    // console.log(decoded.sub);
     const _req = req as AuthRequest; // Typecasting the request to AuthRequest
     _req.userId = decoded.sub as string; // Set the userId in the request
   } catch (err) {
