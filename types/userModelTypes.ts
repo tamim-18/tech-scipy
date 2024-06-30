@@ -11,4 +11,5 @@ export interface userModelTypes {
   address?: mongoose.Types.ObjectId[]; // or ObjectId[] if directly using mongodb types
   whistlist?: mongoose.Types.ObjectId[]; // or ObjectId[] if directly using mongodb types
   isBlocked?: boolean;
+  refreshToken?: string;
 }

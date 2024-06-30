@@ -51,6 +51,9 @@ const userSchema = new mongoose.Schema<userModelTypes>(
       type: Boolean,
       default: false,
     },
+    refreshToken: {
+      type: String,
+    },
   },
   //timestamps
   {

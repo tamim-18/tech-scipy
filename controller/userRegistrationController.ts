@@ -8,7 +8,6 @@ import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
 
 import { config } from "../config/config";
-import { Auth } from "mongodb";
 import { AuthRequest } from "../middlewares/authenticate";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
