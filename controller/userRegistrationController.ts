@@ -86,6 +86,25 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
       expiresIn: "7d",
     });
     //send response
+
+    //creating a cookie
+    const refreshToken = sign({ sub: user._id }, config.jwtSecret as string, {
+      expiresIn: "3d",
+    });
+    // update refresh token in db
+    const updatedUser = await userModel.findByIdAndUpdate(
+      user._id,
+      {
+        refreshToken: refreshToken,
+        // return updated user
+      },
+      { new: true }
+    );
+    //refresh token in cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
     res.status(200).json({ accessToken: token });
   } catch (err) {
     return next(createHttpError(404, "User not found"));
