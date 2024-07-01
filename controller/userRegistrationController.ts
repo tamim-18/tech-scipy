@@ -6,6 +6,7 @@ import createHttpError from "http-errors";
 import { userModelTypes } from "../types/userModelTypes";
 import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 import { config } from "../config/config";
 import { AuthRequest } from "../middlewares/authenticate";
@@ -111,6 +112,80 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+//handle refresh token.. why? because we need to refresh the token after it expires
+const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken);
+    if (!refreshToken) {
+      return next(createHttpError(401, "Unauthorized")); // If refresh token not found
+    }
+
+    const user = await userModel.findOne({ refreshToken });
+    if (!user) {
+      return next(createHttpError(401, "Unauthorized"));
+    }
+
+    jwt.verify(
+      refreshToken,
+      config.jwtSecret as string,
+      (err: jwt.VerifyErrors | null, decoded: any) => {
+        if (err || !decoded || user._id.toString() !== decoded.sub) {
+          return next(createHttpError(401, "Unauthorized"));
+        }
+
+        const token = jwt.sign({ sub: user._id }, config.jwtSecret as string, {
+          expiresIn: "7d",
+        });
+        res.status(200).json({ accessToken: token });
+      }
+    );
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
+//logout user
+
+const logoutUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return next(createHttpError(401, "Unauthorized"));
+    }
+    //get user
+    const user = await userModel.findOne({ refreshToken });
+    if (!user) {
+      //clear cookie
+      res.clearCookie("refreshToken", {
+        httpOnly: true, //cookie cannot be accessed by javascript
+        secure: true, //only works on https
+      });
+      return next(createHttpError(401, "Unauthorized")); //if user not found
+    }
+    //update refresh token in db
+    const updatedUser = await userModel.findByIdAndUpdate(
+      user._id,
+      {
+        refreshToken: "",
+      },
+      { new: true }
+    );
+    //clear cookie
+    res.clearCookie("refreshToken", {
+      httpOnly: true, //cookie cannot be accessed by javascript
+      secure: true, //only works on https
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
 //getting all users
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -212,4 +287,6 @@ export {
   updateUser,
   blockUser,
   unblockUser,
+  refreshToken,
+  logoutUser,
 };
