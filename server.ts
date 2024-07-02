@@ -7,6 +7,7 @@ import connectDb from "./config/db";
 import userRegistrationRouter from "./routes/userRegistrationRouter";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import cookieParser from "cookie-parser";
+import productRouter from "./routes/productRouter";
 
 const app = express();
 const port = config.port;
@@ -32,6 +33,9 @@ app.get("/", (req, res) => {
 
 //user registration
 app.use("/api/user", userRegistrationRouter);
+
+// all product routes
+app.use("/api/product", productRouter);
 
 //handling error
 app.use(globalErrorHandler);

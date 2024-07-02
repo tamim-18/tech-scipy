@@ -40,21 +40,27 @@ const productSchema = new Schema<ProductModelTypes>(
       default: 0,
     },
     //color is an array of strings. Each string is a color
-    color: {
-      type: String,
-      enum: [
-        "white",
-        "black",
-        "blue",
-        "red",
-        "green",
-        "yellow",
-        "brown",
-        "grey",
-        "purple",
-        "pink",
-      ],
-    },
+    color: [
+      {
+        type: String,
+        enum: [
+          "White",
+          "Black",
+          "Red",
+          "Blue",
+          "Green",
+          "Yellow",
+          "Purple",
+          "Pink",
+          "Orange",
+          "Grey",
+          "Brown",
+          "Gold",
+          "Silver",
+          "Others",
+        ],
+      },
+    ],
     brand: {
       type: String,
       enum: [
