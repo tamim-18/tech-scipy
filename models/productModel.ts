@@ -19,11 +19,11 @@ const productSchema = new Schema<ProductModelTypes>(
     },
     description: {
       type: String,
-      unique: true,
+      required: true,
     },
     price: {
       type: Number,
-      require: true,
+      required: true,
     },
     // category is an array of objectIds. Each objectId is a category
     category: [
@@ -34,6 +34,7 @@ const productSchema = new Schema<ProductModelTypes>(
     ],
     quantity: {
       type: Number,
+      required: true,
     },
     sold: {
       type: Number,
