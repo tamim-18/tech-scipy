@@ -19,5 +19,28 @@ const createProduct = async (
     return next(createHttpError(500, "Something went wrong"));
   }
 };
+//get all products
+const getAllProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const allProducts = await productModel.find();
+    res.json(allProducts);
+  } catch (err) {
+    return next(createHttpError(401, "Falied to fetch all the products"));
+  }
+};
+//get a single product
 
-export { createProduct };
+const getAProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const singleUser = await productModel.findById(req.params.id);
+    res.json(singleUser);
+  } catch (err) {
+    return next(createHttpError(401, "Failed to fetch a single product"));
+  }
+};
+
+export { createProduct, getAllProducts, getAProduct };
