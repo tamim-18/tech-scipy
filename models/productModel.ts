@@ -38,10 +38,12 @@ const productSchema = new Schema<ProductModelTypes>(
     quantity: {
       type: Number,
       required: true,
+      select: false, // this will not be shown in the response
     },
     sold: {
       type: Number,
       default: 0,
+      select: false, // this will not be shown in the response
     },
     //color is an array of strings. Each string is a color
     // color: [

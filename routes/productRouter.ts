@@ -5,6 +5,7 @@ import { Router } from "express";
 import { authentication, isAdmin } from "../middlewares/authenticate";
 import {
   createProduct,
+  deleteAproduct,
   getAllProducts,
   getAProduct,
   updateAproduct,
@@ -13,9 +14,11 @@ import {
 const productRouter: Router = Router();
 
 //create product routes
-productRouter.post("/", createProduct);
+productRouter.post("/", authentication, isAdmin, createProduct);
 productRouter.get("/all-products", getAllProducts);
 productRouter.get("/:id", getAProduct);
 productRouter.put("/:id", authentication, isAdmin, updateAproduct);
+
+productRouter.delete("/:id", authentication, isAdmin, deleteAproduct);
 
 export default productRouter;

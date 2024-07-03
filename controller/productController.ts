@@ -30,7 +30,10 @@ const getAllProducts = async (
   next: NextFunction
 ) => {
   try {
-    const allProducts = await productModel.find();
+    const allProducts = await productModel
+      .where("category")
+      .equals(req.query.category); //filtering products by category
+
     res.json(allProducts);
   } catch (err) {
     return next(createHttpError(401, "Falied to fetch all the products"));
@@ -68,4 +71,24 @@ const updateAproduct = async (
   }
 };
 
-export { createProduct, getAllProducts, getAProduct, updateAproduct };
+// delete a product
+const deleteAproduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await productModel.findByIdAndDelete(req.params.id);
+    res.json("User Deleted successfully");
+  } catch (err) {
+    return next(createHttpError(500, "Falied to delete"));
+  }
+};
+
+export {
+  createProduct,
+  getAllProducts,
+  getAProduct,
+  updateAproduct,
+  deleteAproduct,
+};
