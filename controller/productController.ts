@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import productModel from "../models/productModel";
+import slugify from "slugify";
 
 //create product
 const createProduct = async (
@@ -9,8 +10,11 @@ const createProduct = async (
   next: NextFunction
 ) => {
   try {
-    const { title, slug, price, description, quantity } = req.body;
-    if (!title || !slug || !price || !description || !quantity) {
+    const { title, price, description, quantity } = req.body;
+    if (title) {
+      req.body.slug = slugify(title);
+    }
+    if (!title || !price || !description || !quantity) {
       return next(createHttpError(400, "All fields are required"));
     }
     const newProduct = await productModel.create(req.body);
@@ -42,5 +46,26 @@ const getAProduct = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(401, "Failed to fetch a single product"));
   }
 };
+// update a product
 
-export { createProduct, getAllProducts, getAProduct };
+const updateAproduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (req.body.title) {
+      req.body.slug = slugify(req.body.title);
+    }
+    const updatedProduct = await productModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updatedProduct);
+  } catch (err) {
+    return next(createHttpError(500, "Failed to update"));
+  }
+};
+
+export { createProduct, getAllProducts, getAProduct, updateAproduct };

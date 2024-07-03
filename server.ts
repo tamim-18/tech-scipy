@@ -8,6 +8,7 @@ import userRegistrationRouter from "./routes/userRegistrationRouter";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import cookieParser from "cookie-parser";
 import productRouter from "./routes/productRouter";
+import morgan from "morgan";
 
 const app = express();
 const port = config.port;
@@ -15,7 +16,7 @@ const port = config.port;
 app.use(express.json()); // to parse json data
 //cookie parser
 app.use(cookieParser()); // to parse cookies. what is cookie parser? It is a middleware that parses cookies attached to the client request object. It makes cookies available in the request object as req.cookies.
-
+app.use(morgan("dev"));
 // starting
 const startServer = async () => {
   await connectDb();

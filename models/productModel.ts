@@ -26,12 +26,15 @@ const productSchema = new Schema<ProductModelTypes>(
       required: true,
     },
     // category is an array of objectIds. Each objectId is a category
-    category: [
-      {
-        type: ObjectId,
-        ref: "Category",
-      },
-    ],
+    // category: [
+    //   {
+    //     type: ObjectId,
+    //     ref: "Category",
+    //   },
+    // ],
+    category: {
+      type: String,
+    },
     quantity: {
       type: Number,
       required: true,
@@ -41,27 +44,30 @@ const productSchema = new Schema<ProductModelTypes>(
       default: 0,
     },
     //color is an array of strings. Each string is a color
-    color: [
-      {
-        type: String,
-        enum: [
-          "White",
-          "Black",
-          "Red",
-          "Blue",
-          "Green",
-          "Yellow",
-          "Purple",
-          "Pink",
-          "Orange",
-          "Grey",
-          "Brown",
-          "Gold",
-          "Silver",
-          "Others",
-        ],
-      },
-    ],
+    // color: [
+    //   {
+    //     type: String,
+    //     enum: [
+    //       "White",
+    //       "Black",
+    //       "Red",
+    //       "Blue",
+    //       "Green",
+    //       "Yellow",
+    //       "Purple",
+    //       "Pink",
+    //       "Orange",
+    //       "Grey",
+    //       "Brown",
+    //       "Gold",
+    //       "Silver",
+    //       "Others",
+    //     ],
+    //   },
+    // ],
+    color: {
+      type: String,
+    },
     brand: {
       type: String,
       enum: [

@@ -6,12 +6,14 @@ export interface ProductModelTypes {
   slug: string;
   description: string;
   price: number;
-  category: Types.ObjectId[];
+  // category: Types.ObjectId[];
+  category: string;
   brand: string;
   quantity: number;
   sold?: number;
   images?: Array<{ public_id: string; url: string }>;
-  color?: string[];
+  // color?: string[];
+  color?: string;
   tags?: string;
   ratings?: Array<{
     star: number;
