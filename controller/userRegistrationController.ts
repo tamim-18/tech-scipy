@@ -242,6 +242,35 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(500, "Something went wrong"));
   }
 };
+//update password
+const updatePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const _req = req as AuthRequest;
+  const { oldPassword, newPassword } = req.body;
+  try {
+    const user = await userModel.findById(_req.userId);
+    if (!user) {
+      return next(createHttpError(404, "User not found"));
+    }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return next(createHttpError(400, "Invalid credentials"));
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const updatedUser = await userModel.findByIdAndUpdate(
+      _req.userId,
+      {
+        password: hashedPassword,
+      },
+      { new: true }
+    );
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
 
 // block user.. only admin can block user
 
@@ -289,4 +318,5 @@ export {
   unblockUser,
   refreshToken,
   logoutUser,
+  updatePassword,
 };

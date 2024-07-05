@@ -1,7 +1,11 @@
-import { NextFunction, Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import productModel from "../models/productModel";
 import slugify from "slugify";
+interface PaginationQuery {
+  page?: string;
+  limit?: string;
+}
 
 //create product
 const createProduct = async (
@@ -30,10 +34,58 @@ const getAllProducts = async (
   next: NextFunction
 ) => {
   try {
-    const allProducts = await productModel
-      .where("category")
-      .equals(req.query.category); //filtering products by category
+    const queryObj = { ...req.query }; //query object
+    //advance filtering...
+    const excludedFields = ["page", "sort", "limit", "fields"]; //fields to exclude
+    excludedFields.forEach((el) => delete queryObj[el]); //delete the fields from the query object
+    let queryStr = JSON.stringify(queryObj); //convert the query object to string
+    console.log(queryStr);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); //replace the query object with the query string
+    // console.log(queryStr);
+    // console.log(JSON.parse(queryStr));
+    // get all products
 
+    // const allProducts = await productModel.find(JSON.parse(queryStr));
+
+    const query = productModel.find(JSON.parse(queryStr));
+
+    // const allProducts = await productModel.find(queryObj);
+    //filtering products by category
+
+    //sorting products
+    const sort = req.query.sort;
+    if (sort) {
+      //@ts-ignore
+      const sortBy = sort.split(",").join(" ");
+      console.log(sortBy);
+      query.sort(sortBy);
+    } else {
+      query.sort("-createdAt");
+    }
+
+    const { page = "1", limit = "100" } = req.query as PaginationQuery;
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+    console.log(skip, limitNumber);
+    query.skip(skip).limit(limitNumber); //skip and limit the products
+    //validate the page number
+    if (req.query.page) {
+      const totalProducts = await productModel.countDocuments();
+      if (skip >= totalProducts) {
+        return next(createHttpError(400, "This page does not exist"));
+      }
+    }
+
+    //fields limiting
+    if (req.query.fields) {
+      //@ts-ignore
+      const fields = req.query.fields.split(",").join(" ");
+      query.select(fields);
+    } else {
+      query.select("-__v"); //exclude the version field
+    }
+    const allProducts = await query;
     res.json(allProducts);
   } catch (err) {
     return next(createHttpError(401, "Falied to fetch all the products"));
