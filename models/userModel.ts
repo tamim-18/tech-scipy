@@ -54,6 +54,9 @@ const userSchema = new mongoose.Schema<userModelTypes>(
     refreshToken: {
       type: String,
     },
+    passWordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   //timestamps
   {

@@ -12,4 +12,7 @@ export interface userModelTypes {
   whistlist?: mongoose.Types.ObjectId[]; // or ObjectId[] if directly using mongodb types
   isBlocked?: boolean;
   refreshToken?: string;
+  passWordChangedAt?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
 }

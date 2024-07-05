@@ -10,6 +10,7 @@ import {
   logoutUser,
   refreshToken,
   unblockUser,
+  updatePassword,
   updateUser,
   userLogin,
 } from "../controller/userRegistrationController";
@@ -20,6 +21,8 @@ const userRouter = express.Router();
 userRouter.post("/register", createUser);
 userRouter.post("/login", userLogin);
 userRouter.get("/refresh-token", refreshToken);
+//change password
+userRouter.put("/change-password", authentication, updatePassword);
 //logout user
 userRouter.get("/logout", logoutUser);
 

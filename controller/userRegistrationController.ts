@@ -10,6 +10,7 @@ import jwt from "jsonwebtoken";
 
 import { config } from "../config/config";
 import { AuthRequest } from "../middlewares/authenticate";
+import crypto from "crypto";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //if user already exists
@@ -248,25 +249,41 @@ const updatePassword = async (
   res: Response,
   next: NextFunction
 ) => {
-  const _req = req as AuthRequest;
-  const { oldPassword, newPassword } = req.body;
   try {
+    const resetToken = crypto.randomBytes(32).toString("hex"); //generate random token
+    const passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex"); //hash the token
+    const passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    //update password reset token and password reset expires
+    //from AuthRequest we can access the userId
+    const _req = req as AuthRequest;
+    //upadte the password by checking
+    const { currentPassword, password } = req.body;
+    //check if the current password is correct
     const user = await userModel.findById(_req.userId);
     if (!user) {
       return next(createHttpError(404, "User not found"));
     }
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    console.log(password);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    console.log(isMatch);
     if (!isMatch) {
-      return next(createHttpError(400, "Invalid credentials"));
+      return next(createHttpError(401, "Please enter correct password"));
     }
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    //hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
     const updatedUser = await userModel.findByIdAndUpdate(
       _req.userId,
       {
         password: hashedPassword,
+        passwordResetToken: passwordResetToken,
+        passwordResetExpires: passwordResetExpires,
       },
       { new: true }
     );
+    res.status(200).json(updatedUser);
   } catch (err) {
     return next(createHttpError(500, "Something went wrong"));
   }
