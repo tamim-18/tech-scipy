@@ -5,6 +5,7 @@ import {
   blockUser,
   createUser,
   deleteUser,
+  forgetPasswordToken,
   getAllUsers,
   getSingleUser,
   logoutUser,
@@ -23,6 +24,7 @@ userRouter.post("/login", userLogin);
 userRouter.get("/refresh-token", refreshToken);
 //change password
 userRouter.put("/change-password", authentication, updatePassword);
+userRouter.post("/forgetPassword-token", forgetPasswordToken);
 //logout user
 userRouter.get("/logout", logoutUser);
 

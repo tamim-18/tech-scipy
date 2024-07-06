@@ -8,6 +8,8 @@ const _cofig = {
   dburl: env.MONGO_URI,
   env: env.NODE_ENV,
   jwtSecret: env.JWT_SECRET_KEY,
+  email: env.EMAIL,
+  password: env.PASSWORD,
 };
 
 // freezing

@@ -1,3 +1,4 @@
+import { env } from "process";
 // creating user registration controller
 
 import { NextFunction, Request, Response } from "express";
@@ -11,6 +12,7 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/config";
 import { AuthRequest } from "../middlewares/authenticate";
 import crypto from "crypto";
+import { sendMail } from "../middlewares/mailControl";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //if user already exists
@@ -289,6 +291,48 @@ const updatePassword = async (
   }
 };
 
+const forgetPasswordToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email } = req.body;
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return next(createHttpError(404, "User not found"));
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    const passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    await userModel.findOneAndUpdate(
+      { email },
+      {
+        passwordResetToken: passwordResetToken,
+        passwordResetExpires: passwordResetExpires,
+      },
+      { new: true }
+    );
+
+    const resetUrl = `Hi, please follow the link to reset your password. This link will expire in 10 minutes.<a href='http://localhost:5000/api/user/reset-password/${resetToken}'>Click Here</a>`;
+    const data = {
+      subject: "Password Reset",
+      text: "Password Reset",
+      to: email,
+      hmtl: resetUrl,
+    };
+    //@ts-ignore
+    await sendMail(data);
+    res.status(200).json({ message: "Password reset email sent successfully" });
+  } catch (err) {
+    next(createHttpError(500, "Something went wrong"));
+  }
+};
 // block user.. only admin can block user
 
 const blockUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -336,4 +380,5 @@ export {
   refreshToken,
   logoutUser,
   updatePassword,
+  forgetPasswordToken,
 };
