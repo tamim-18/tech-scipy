@@ -10,6 +10,7 @@ import {
   getSingleUser,
   logoutUser,
   refreshToken,
+  resetPassword,
   unblockUser,
   updatePassword,
   updateUser,
@@ -25,6 +26,8 @@ userRouter.get("/refresh-token", refreshToken);
 //change password
 userRouter.put("/change-password", authentication, updatePassword);
 userRouter.post("/forgetPassword-token", forgetPasswordToken);
+userRouter.put("/reset-password/:resetToken", resetPassword);
+
 //logout user
 userRouter.get("/logout", logoutUser);
 

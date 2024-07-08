@@ -122,8 +122,7 @@ const refreshToken = async (
   next: NextFunction
 ) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
-    console.log(refreshToken);
+    const refreshToken = req.cookies.refreshToken; //get refresh token from cookie
     if (!refreshToken) {
       return next(createHttpError(401, "Unauthorized")); // If refresh token not found
     }
@@ -132,7 +131,7 @@ const refreshToken = async (
     if (!user) {
       return next(createHttpError(401, "Unauthorized"));
     }
-
+    //verify the token. beacuse we need to check if the token is valid or not. if not valid then we need to send unauthorized
     jwt.verify(
       refreshToken,
       config.jwtSecret as string,
@@ -333,6 +332,46 @@ const forgetPasswordToken = async (
     next(createHttpError(500, "Something went wrong"));
   }
 };
+// reset password
+const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { password } = req.body;
+    const { resetToken } = req.params;
+    //hash the token
+    const passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    //check if the token is valid
+
+    const user = await userModel.findOne({
+      passwordResetToken: passwordResetToken,
+      passwordResetExpires: { $gt: Date.now() }, //check if the token is not expired
+    });
+    if (!user) {
+      return next(createHttpError(400, "Token is invalid or expired"));
+    }
+    //hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    //update the password
+    const updatedUser = await userModel.findByIdAndUpdate(
+      user._id,
+      {
+        password: hashedPassword,
+        passwordResetToken: "",
+        passwordResetExpires: "",
+      },
+      { new: true }
+    );
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
 // block user.. only admin can block user
 
 const blockUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -381,4 +420,5 @@ export {
   logoutUser,
   updatePassword,
   forgetPasswordToken,
+  resetPassword,
 };

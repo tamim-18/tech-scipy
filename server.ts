@@ -9,6 +9,7 @@ import globalErrorHandler from "./middlewares/globalErrorHandler";
 import cookieParser from "cookie-parser";
 import productRouter from "./routes/productRouter";
 import morgan from "morgan";
+import blogRouter from "./routes/blogRouter";
 
 const app = express();
 const port = config.port;
@@ -37,6 +38,8 @@ app.use("/api/user", userRegistrationRouter);
 
 // all product routes
 app.use("/api/product", productRouter);
+//all blog routes
+app.use("/api/blog", blogRouter);
 
 //handling error
 app.use(globalErrorHandler);
