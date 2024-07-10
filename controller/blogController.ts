@@ -31,7 +31,7 @@ const updateAblog = async (req: Request, res: Response, next: NextFunction) => {
 const getAblog = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
-    const blog = await blogModel.findById(id);
+    const blog = await blogModel.findById(id).populate("likes"); //poulate method is used to get the user details who liked the blog
     const updateViews = await blogModel.findByIdAndUpdate(
       id,
       {
@@ -39,7 +39,7 @@ const getAblog = async (req: Request, res: Response, next: NextFunction) => {
       },
       { new: true }
     );
-    res.json(updateViews);
+    res.json(blog);
   } catch (err) {
     return next(createHttpError(500, "Failed to get the blog"));
   }

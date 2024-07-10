@@ -10,6 +10,8 @@ import cookieParser from "cookie-parser";
 import productRouter from "./routes/productRouter";
 import morgan from "morgan";
 import blogRouter from "./routes/blogRouter";
+import categoryRouter from "./routes/categoryRoutes";
+import { authentication, isAdmin } from "./middlewares/authenticate";
 
 const app = express();
 const port = config.port;
@@ -40,6 +42,8 @@ app.use("/api/user", userRegistrationRouter);
 app.use("/api/product", productRouter);
 //all blog routes
 app.use("/api/blog", blogRouter);
+//all category routes
+app.use("/api/category", authentication, isAdmin, categoryRouter);
 
 //handling error
 app.use(globalErrorHandler);
