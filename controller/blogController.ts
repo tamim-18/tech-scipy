@@ -66,44 +66,115 @@ const getAllBlogs = async (req: Request, res: Response, next: NextFunction) => {
 };
 //like a blog
 const likeBlog = async (req: Request, res: Response, next: NextFunction) => {
-  //get the login user
+  // Get the logged-in user
   const _req = req as AuthRequest;
-  // console.log(_req.userId);
-  // get the blog id
+
+  // Get the blog ID
   const { blogId } = req.body;
-  // console.log(blogId);
+
   try {
-    //find the blog
+    // Find the blog
     const blog = await blogModel.findById(blogId);
-    // console.log(blog);
-    const isLiked = blog?.isLiked;
+
+    // Check if the user has already disliked the blog
     const alreadyDisliked = blog?.dislikes?.find(
       (dislike) => dislike.toString() === _req.userId
-    ); //check if the user has already disliked the blog
+    );
+
     if (alreadyDisliked) {
-      const updatedBlog = await blogModel.findByIdAndUpdate(blogId, {
-        $pull: { dislikes: _req.userId }, //remove the user from the dislikes array
+      await blogModel.findByIdAndUpdate(blogId, {
+        $pull: { dislikes: _req.userId }, // Remove the user from the dislikes array
         isDisliked: false,
       });
     }
+
+    // Check if the user has already liked the blog
+    const isLiked = blog?.isLiked;
+    let updatedBlog: any;
+
     if (isLiked) {
-      const updatedBlog = await blogModel.findByIdAndUpdate(blogId, {
-        $pull: { likes: _req.userId }, //remove the user from the likes array
-        isLiked: false,
-      });
-    } else {
-      const updatedBlog = await blogModel.findByIdAndUpdate(
+      updatedBlog = await blogModel.findByIdAndUpdate(
         blogId,
         {
-          $push: { likes: _req.userId }, //add the user to the likes array
+          $pull: { likes: _req.userId }, // Remove the user from the likes array
+          isLiked: false,
+        },
+        { new: true }
+      );
+    } else {
+      updatedBlog = await blogModel.findByIdAndUpdate(
+        blogId,
+        {
+          $push: { likes: _req.userId }, // Add the user to the likes array
           isLiked: true,
         },
         { new: true }
       );
-      res.json(updatedBlog);
     }
+
+    res.json(updatedBlog);
   } catch (err) {
     return next(createHttpError(500, "Failed to like the blog"));
+  }
+};
+//dislike a blog
+const dislikedBlog = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const _req = req as AuthRequest;
+  const { blogId } = req.body;
+
+  try {
+    const blog = await blogModel.findById(blogId);
+    if (!blog) {
+      return next(createHttpError(404, "Blog not found"));
+    }
+
+    const alreadyLiked = blog.likes?.some(
+      (like) => like.toString() === _req.userId
+    );
+    const isDisliked = blog.isDisliked;
+    let updatedBlog: any;
+
+    // If the user already liked the blog, remove the like
+    if (alreadyLiked) {
+      updatedBlog = await blogModel.findByIdAndUpdate(
+        blogId,
+        {
+          $pull: { likes: _req.userId },
+          isLiked: false,
+        },
+        { new: true }
+      );
+    }
+
+    // If the blog is already disliked, remove the dislike
+    if (isDisliked) {
+      updatedBlog = await blogModel.findByIdAndUpdate(
+        blogId,
+        {
+          $pull: { dislikes: _req.userId },
+          isDisliked: false,
+        },
+        { new: true }
+      );
+    } else {
+      // Otherwise, add the dislike
+      updatedBlog = await blogModel.findByIdAndUpdate(
+        blogId,
+        {
+          $push: { dislikes: _req.userId },
+          isDisliked: true,
+        },
+        { new: true }
+      );
+    }
+
+    res.json(updatedBlog);
+  } catch (err) {
+    next(createHttpError(500, "Failed to dislike the blog"));
   }
 };
 
@@ -114,4 +185,5 @@ export {
   deleteAblog,
   getAllBlogs,
   likeBlog,
+  dislikedBlog,
 };

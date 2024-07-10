@@ -4,6 +4,7 @@ import { authentication, isAdmin } from "../middlewares/authenticate";
 import {
   createBlog,
   deleteAblog,
+  dislikedBlog,
   getAblog,
   getAllBlogs,
   likeBlog,
@@ -13,10 +14,11 @@ import {
 const blogRouter = express.Router();
 
 blogRouter.post("/", authentication, isAdmin, createBlog);
-
+blogRouter.put("/likes", authentication, likeBlog);
+blogRouter.put("/dislikes", authentication, dislikedBlog);
 //update a blog
 blogRouter.put("/:id", authentication, isAdmin, updateAblog);
-blogRouter.put("/likes", authentication, likeBlog);
+
 //get a blog
 blogRouter.get("/:id", getAblog);
 //delete a blog
