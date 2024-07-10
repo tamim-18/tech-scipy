@@ -68,14 +68,14 @@ const getAllBlogs = async (req: Request, res: Response, next: NextFunction) => {
 const likeBlog = async (req: Request, res: Response, next: NextFunction) => {
   //get the login user
   const _req = req as AuthRequest;
-  console.log(_req.userId);
+  // console.log(_req.userId);
   // get the blog id
   const { blogId } = req.body;
-  console.log(blogId);
+  // console.log(blogId);
   try {
     //find the blog
     const blog = await blogModel.findById(blogId);
-    console.log(blog);
+    // console.log(blog);
     const isLiked = blog?.isLiked;
     const alreadyDisliked = blog?.dislikes?.find(
       (dislike) => dislike.toString() === _req.userId

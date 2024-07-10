@@ -16,6 +16,7 @@ blogRouter.post("/", authentication, isAdmin, createBlog);
 
 //update a blog
 blogRouter.put("/:id", authentication, isAdmin, updateAblog);
+blogRouter.put("/likes", authentication, likeBlog);
 //get a blog
 blogRouter.get("/:id", getAblog);
 //delete a blog
@@ -23,6 +24,5 @@ blogRouter.delete("/:id", authentication, isAdmin, deleteAblog);
 //get all blogs
 blogRouter.get("/", getAllBlogs);
 //like a blog
-blogRouter.put("/likes", authentication, likeBlog);
 
 export default blogRouter;
