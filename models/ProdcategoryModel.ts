@@ -1,4 +1,4 @@
-import { CategoryModelTypes } from "./../types/categoryTypes";
+import { CategoryModelTypes } from "../types/categoryTypes";
 import { model, Schema } from "mongoose";
 
 const categorySchema = new Schema<CategoryModelTypes>(

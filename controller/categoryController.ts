@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import createHttpError, { HttpError } from "http-errors";
-import categoryModel from "../models/categoryModel";
+import categoryModel from "../models/ProdcategoryModel";
 
 //creating newcategory
 const createCategory = async (
@@ -21,5 +21,79 @@ const createCategory = async (
     return next(createHttpError(500, "Failed to create a category"));
   }
 };
+// update a category
+const updateAcategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+  console.log(id);
 
-export { createCategory };
+  try {
+    const updatedCategory = await categoryModel.findByIdAndUpdate(
+      id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (!updatedCategory) {
+      return next(createHttpError(404, "Category not found"));
+    }
+    res.json(updatedCategory);
+  } catch (err) {
+    return next(createHttpError(500, "Failed to update the category!!"));
+  }
+};
+//delete a category
+const deleteAcategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+  console.log(id);
+
+  try {
+    const deletedCategory = await categoryModel.findByIdAndDelete(id);
+    if (!deletedCategory) {
+      return next(createHttpError(404, "Category not found"));
+    }
+    res.json(deletedCategory);
+  } catch (err) {
+    return next(createHttpError(500, "Failed to update the category!!"));
+  }
+};
+// get a category
+const getAcategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const category = await categoryModel.findById(req.params);
+    res.json(category);
+  } catch (err) {
+    return next(createHttpError(401, "Failed to fetch a book"));
+  }
+};
+const getAllcategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const categories = await categoryModel.find();
+  } catch (err) {
+    return next(createHttpError(401, "Failed to find all the produts"));
+  }
+};
+
+export {
+  createCategory,
+  updateAcategory,
+  deleteAcategory,
+  getAcategory,
+  getAllcategory,
+};
