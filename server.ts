@@ -12,6 +12,7 @@ import morgan from "morgan";
 import blogRouter from "./routes/blogRouter";
 import categoryRouter from "./routes/categoryRoutes";
 import { authentication, isAdmin } from "./middlewares/authenticate";
+import brandRouter from "./routes/brandRouter";
 
 const app = express();
 const port = config.port;
@@ -44,6 +45,7 @@ app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
 //all category routes
 app.use("/api/category", categoryRouter);
+app.use("/api/brand", brandRouter);
 
 //handling error
 app.use(globalErrorHandler);
