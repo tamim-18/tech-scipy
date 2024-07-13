@@ -1,7 +1,9 @@
+import { AuthRequest } from "./../middlewares/authenticate";
 import e, { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import productModel from "../models/productModel";
 import slugify from "slugify";
+import userModel from "../models/userModel";
 interface PaginationQuery {
   page?: string;
   limit?: string;
@@ -136,6 +138,35 @@ const deleteAproduct = async (
     return next(createHttpError(500, "Falied to delete"));
   }
 };
+// addtowhistList
+
+const addToWhistList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const _req = req as AuthRequest;
+  const { prodId } = req.body;
+
+  try {
+    // getting the user
+    const user = await userModel.findById(_req.userId);
+    const allreadyAdded = user?.whistlist?.find((e) => e.toString() === prodId);
+    let updatedProduct: any;
+    if (allreadyAdded) {
+      updatedProduct = await productModel.findByIdAndUpdate(prodId, {
+        $pull: { whistlist: _req.userId },
+      });
+    } else {
+      updatedProduct = await productModel.findByIdAndUpdate(prodId, {
+        $push: { whistlist: _req.userId },
+      });
+      res.json(updatedProduct);
+    }
+  } catch (err) {
+    return next(createHttpError(404, "Failed to add wishList 😭"));
+  }
+};
 
 export {
   createProduct,
@@ -143,4 +174,5 @@ export {
   getAProduct,
   updateAproduct,
   deleteAproduct,
+  addToWhistList,
 };

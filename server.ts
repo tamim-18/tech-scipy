@@ -13,6 +13,7 @@ import blogRouter from "./routes/blogRouter";
 import categoryRouter from "./routes/categoryRoutes";
 import { authentication, isAdmin } from "./middlewares/authenticate";
 import brandRouter from "./routes/brandRouter";
+import blogCategoryRouter from "./routes/blogCategoryRouter";
 
 const app = express();
 const port = config.port;
@@ -46,6 +47,7 @@ app.use("/api/blog", blogRouter);
 //all category routes
 app.use("/api/category", categoryRouter);
 app.use("/api/brand", brandRouter);
+app.use("/api/blogcategory", blogCategoryRouter);
 
 //handling error
 app.use(globalErrorHandler);

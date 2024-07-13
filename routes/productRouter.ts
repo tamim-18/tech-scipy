@@ -17,6 +17,7 @@ const productRouter: Router = Router();
 productRouter.post("/", authentication, isAdmin, createProduct);
 productRouter.get("/all-products", getAllProducts);
 productRouter.get("/:id", getAProduct);
+productRouter.put("/addtoWhistlist", authentication);
 productRouter.put("/:id", authentication, isAdmin, updateAproduct);
 
 productRouter.delete("/:id", authentication, isAdmin, deleteAproduct);
