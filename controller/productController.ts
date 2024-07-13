@@ -152,17 +152,26 @@ const addToWhistList = async (
     // getting the user
     const user = await userModel.findById(_req.userId);
     const allreadyAdded = user?.whistlist?.find((e) => e.toString() === prodId);
-    let updatedProduct: any;
+    let updatedUser: any;
     if (allreadyAdded) {
-      updatedProduct = await productModel.findByIdAndUpdate(prodId, {
-        $pull: { whistlist: _req.userId },
-      });
+      updatedUser = await userModel.findByIdAndUpdate(
+        _req.userId,
+        {
+          $pull: { whistlist: prodId },
+        },
+        { new: true }
+      );
     } else {
-      updatedProduct = await productModel.findByIdAndUpdate(prodId, {
-        $push: { whistlist: _req.userId },
-      });
-      res.json(updatedProduct);
+      updatedUser = await userModel.findByIdAndUpdate(
+        _req.userId,
+        {
+          $push: { whistlist: prodId },
+        },
+        { new: true }
+      );
     }
+    console.log(updatedUser);
+    res.json(updatedUser);
   } catch (err) {
     return next(createHttpError(404, "Failed to add wishList 😭"));
   }

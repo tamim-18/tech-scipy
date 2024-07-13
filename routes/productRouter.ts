@@ -4,6 +4,7 @@ import express from "express";
 import { Router } from "express";
 import { authentication, isAdmin } from "../middlewares/authenticate";
 import {
+  addToWhistList,
   createProduct,
   deleteAproduct,
   getAllProducts,
@@ -17,7 +18,7 @@ const productRouter: Router = Router();
 productRouter.post("/", authentication, isAdmin, createProduct);
 productRouter.get("/all-products", getAllProducts);
 productRouter.get("/:id", getAProduct);
-productRouter.put("/addtoWhistlist", authentication);
+productRouter.put("/addtoWhistlist", authentication, addToWhistList);
 productRouter.put("/:id", authentication, isAdmin, updateAproduct);
 
 productRouter.delete("/:id", authentication, isAdmin, deleteAproduct);
