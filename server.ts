@@ -43,7 +43,7 @@ app.use("/api/product", productRouter);
 //all blog routes
 app.use("/api/blog", blogRouter);
 //all category routes
-app.use("/api/category", authentication, isAdmin, categoryRouter);
+app.use("/api/category", categoryRouter);
 
 //handling error
 app.use(globalErrorHandler);

@@ -71,8 +71,9 @@ const getAcategory = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log(req.params.id);
   try {
-    const category = await categoryModel.findById(req.params);
+    const category = await categoryModel.findById(req.params.id);
     res.json(category);
   } catch (err) {
     return next(createHttpError(401, "Failed to fetch a book"));
@@ -85,6 +86,7 @@ const getAllcategory = async (
 ) => {
   try {
     const categories = await categoryModel.find();
+    res.json(categories);
   } catch (err) {
     return next(createHttpError(401, "Failed to find all the produts"));
   }
