@@ -177,6 +177,53 @@ const addToWhistList = async (
   }
 };
 
+const rating = async (req: Request, res: Response, next: NextFunction) => {
+  const _req = req as AuthRequest;
+  const { star, prodId } = req.body;
+
+  try {
+    const product = await productModel.findById(prodId);
+    if (!product) {
+      return next(createHttpError(404, "Product not found"));
+    }
+
+    const alreadyRated = product?.ratings?.find(
+      (el) => el.postedby.toString() === _req.userId
+    );
+
+    let rateProduct: any;
+    if (alreadyRated) {
+      await productModel.updateOne(
+        {
+          _id: prodId,
+          //@ts-ignore
+          "ratings._id": alreadyRated._id,
+        },
+        {
+          $set: { "ratings.$.star": star },
+        }
+      );
+      rateProduct = await productModel.findById(prodId); // Retrieve updated product
+    } else {
+      rateProduct = await productModel.findByIdAndUpdate(
+        prodId,
+        {
+          $push: {
+            ratings: {
+              star: star,
+              postedby: _req.userId,
+            },
+          },
+        },
+        { new: true }
+      );
+    }
+    res.json(rateProduct);
+  } catch (err) {
+    return next(createHttpError(500, "Failed to fetch the product ratings"));
+  }
+};
+
 export {
   createProduct,
   getAllProducts,
@@ -184,4 +231,5 @@ export {
   updateAproduct,
   deleteAproduct,
   addToWhistList,
+  rating,
 };

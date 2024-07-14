@@ -93,18 +93,18 @@ const productSchema = new Schema<ProductModelTypes>(
     // ratings are stored in an array of objects. Each object contains the star rating, comment, and the user who posted the rating
     ratings: [
       {
-        star: {
-          type: Number,
-        },
-        comment: {
-          type: String,
-        },
+        star: Number,
+        comment: String,
         postedby: {
           type: ObjectId,
           ref: "User",
         },
       },
     ],
+    totalrating: {
+      type: String,
+      default: 0,
+    },
   },
   //timestamps
   {
