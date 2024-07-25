@@ -218,6 +218,11 @@ const rating = async (req: Request, res: Response, next: NextFunction) => {
         { new: true }
       );
     }
+    const totalRating = rateProduct.ratings.length;
+    let ratingSum = 0;
+    rateProduct.ratings.forEach((rating: any) => {
+      ratingSum += rating.star;
+    });
     res.json(rateProduct);
   } catch (err) {
     return next(createHttpError(500, "Failed to fetch the product ratings"));
