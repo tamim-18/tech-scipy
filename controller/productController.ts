@@ -179,7 +179,8 @@ const addToWhistList = async (
 
 const rating = async (req: Request, res: Response, next: NextFunction) => {
   const _req = req as AuthRequest;
-  const { star, prodId } = req.body;
+  const { star, prodId, comment } = req.body;
+  console.log(comment);
 
   try {
     const product = await productModel.findById(prodId);
@@ -200,7 +201,7 @@ const rating = async (req: Request, res: Response, next: NextFunction) => {
           "ratings._id": alreadyRated._id,
         },
         {
-          $set: { "ratings.$.star": star },
+          $set: { "ratings.$.star": star, "ratings.$.comment": comment },
         }
       );
       rateProduct = await productModel.findById(prodId); // Retrieve updated product
@@ -211,6 +212,7 @@ const rating = async (req: Request, res: Response, next: NextFunction) => {
           $push: {
             ratings: {
               star: star,
+              comment: comment,
               postedby: _req.userId,
             },
           },
@@ -220,9 +222,20 @@ const rating = async (req: Request, res: Response, next: NextFunction) => {
     }
     const totalRating = rateProduct.ratings.length;
     let ratingSum = 0;
-    rateProduct.ratings.forEach((rating: any) => {
-      ratingSum += rating.star;
-    });
+    const totalRatingSum = rateProduct?.ratings?.reduce(
+      (sum: any, rating: any) => sum + rating.star,
+      0
+    );
+    const avgRating = Math.round(totalRatingSum / totalRating);
+    rateProduct = await productModel.findByIdAndUpdate(
+      prodId,
+      {
+        totalrating: avgRating,
+      },
+      {
+        new: true,
+      }
+    );
     res.json(rateProduct);
   } catch (err) {
     return next(createHttpError(500, "Failed to fetch the product ratings"));

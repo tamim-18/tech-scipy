@@ -14,6 +14,7 @@ import categoryRouter from "./routes/categoryRoutes";
 import { authentication, isAdmin } from "./middlewares/authenticate";
 import brandRouter from "./routes/brandRouter";
 import blogCategoryRouter from "./routes/blogCategoryRouter";
+import couponRouter from "./routes/couponRouter";
 
 const app = express();
 const port = config.port;
@@ -48,6 +49,7 @@ app.use("/api/blog", blogRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/brand", brandRouter);
 app.use("/api/blogcategory", blogCategoryRouter);
+app.use("/api/coupon", couponRouter);
 
 //handling error
 app.use(globalErrorHandler);
