@@ -1,10 +1,19 @@
 import { Router } from "express";
-import { createCoupon } from "../controller/couponController";
+import {
+  createCoupon,
+  deleteCoupon,
+  getAllCoupons,
+  updateACoupon,
+} from "../controller/couponController";
 import { authentication, isAdmin } from "../middlewares/authenticate";
 
 const couponRouter = Router();
 
 // create coupon
-couponRouter.post("/", authentication, isAdmin, createCoupon);
+couponRouter
+  .post("/", authentication, isAdmin, createCoupon)
+  .get("/", authentication, isAdmin, getAllCoupons)
+  .put("/:id", authentication, isAdmin, updateACoupon)
+  .delete("/:id", authentication, isAdmin, deleteCoupon);
 
 export default couponRouter;
