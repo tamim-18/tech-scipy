@@ -1,9 +1,14 @@
-import { AuthRequest } from "./../middlewares/authenticate";
-import e, { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import sharp from "sharp";
+import path from "path";
+import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
 import createHttpError from "http-errors";
 import productModel from "../models/productModel";
+import { AuthRequest } from "../middlewares/authenticate";
 import slugify from "slugify";
 import userModel from "../models/userModel";
+
 interface PaginationQuery {
   page?: string;
   limit?: string;
@@ -242,6 +247,58 @@ const rating = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// create upload photo
+
+const uploadPhotos = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+  const files = req.files as Express.Multer.File[];
+
+  try {
+    const uploadResults = await Promise.all(
+      files.map(async (file) => {
+        const outputPath = path.join(
+          __dirname,
+          "../../public/data/uploads/resized",
+          file.filename
+        );
+        await sharp(file.path)
+          .resize(300, 300)
+          .toFormat("jpeg")
+          .jpeg({ quality: 90 })
+          .toFile(outputPath);
+
+        const result = await cloudinary.uploader.upload(outputPath, {
+          folder: "product-images",
+        });
+
+        fs.unlinkSync(file.path); // Delete the original file
+        fs.unlinkSync(outputPath); // Delete the resized file
+
+        return { public_id: result.public_id, url: result.secure_url };
+      })
+    );
+
+    const product = await productModel.findById(id);
+    if (!product) {
+      return next(createHttpError(404, "Product not found"));
+    }
+
+    product.images = product.images
+      ? [...product.images, ...uploadResults]
+      : uploadResults;
+    await product.save();
+
+    res.status(200).json({ images: product.images });
+  } catch (err) {
+    console.error(err);
+    return next(createHttpError(500, "Error while uploading files"));
+  }
+};
+
 export {
   createProduct,
   getAllProducts,
@@ -250,4 +307,5 @@ export {
   deleteAproduct,
   addToWhistList,
   rating,
+  uploadPhotos,
 };
