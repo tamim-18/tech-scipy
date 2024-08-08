@@ -258,27 +258,28 @@ const uploadPhotos = async (
   const files = req.files as Express.Multer.File[];
 
   try {
+    // Check if the product exists
     const uploadResults = await Promise.all(
       files.map(async (file) => {
         const outputPath = path.join(
           __dirname,
           "../../public/data/uploads/resized",
           file.filename
-        );
+        ); // Output path for resized file
         await sharp(file.path)
           .resize(300, 300)
           .toFormat("jpeg")
           .jpeg({ quality: 90 })
-          .toFile(outputPath);
+          .toFile(outputPath); // Resize the file
 
         const result = await cloudinary.uploader.upload(outputPath, {
           folder: "product-images",
-        });
+        }); // Upload the resized file to Cloudinary
 
         fs.unlinkSync(file.path); // Delete the original file
         fs.unlinkSync(outputPath); // Delete the resized file
 
-        return { public_id: result.public_id, url: result.secure_url };
+        return { public_id: result.public_id, url: result.secure_url }; // Return the public_id and secure_url
       })
     );
 
