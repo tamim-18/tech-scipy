@@ -37,5 +37,6 @@ productRouter.put("/rating", authentication, rating);
 productRouter.put("/:id", authentication, isAdmin, updateAproduct);
 
 productRouter.delete("/:id", authentication, isAdmin, deleteAproduct);
+// router
 
 export default productRouter;
