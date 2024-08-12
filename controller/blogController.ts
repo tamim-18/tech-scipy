@@ -4,6 +4,10 @@ import userModel from "../models/userModel";
 import e, { Request, Response, NextFunction } from "express";
 import { AuthRequest } from "../middlewares/authenticate";
 import validateMongoDbId from "../utils/validateMongoDbId";
+import sharp from "sharp";
+import path from "path";
+import cloudinary from "../config/cloudinary_config";
+import fs from "fs";
 
 const createBlog = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -178,6 +182,57 @@ const dislikedBlog = async (
   }
 };
 
+const uploadBlogPhotos = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const files = req.files as Express.Multer.File[];
+    //console.log(files);
+
+    //utility function for image upload. What does it do? See after the code
+    const uploadResults = await Promise.all(
+      files.map(async (file) => {
+        const outputPath = path.join(
+          __dirname,
+          "../public/data/uploads/resized",
+          file.filename
+        ); // Output path for resized file
+        await sharp(file.path)
+          .resize(300, 300)
+          .toFormat("jpeg")
+          .jpeg({ quality: 90 })
+          .toFile(outputPath); // Resize the file
+
+        const result = await cloudinary.uploader.upload(outputPath, {
+          folder: "blog-images",
+        }); // Upload the resized file to Cloudinary
+
+        fs.unlinkSync(file.path); // Delete the original file
+        fs.unlinkSync(outputPath); // Delete the resized file
+
+        return { public_id: result.public_id, url: result.secure_url }; // Return the public_id and secure_url
+      })
+    );
+    // utility function ends here. This function uploads the image to cloudinary and returns the public_id and secure_url
+
+    // Check if the blog exists
+    const blog = await blogModel.findById(id);
+    if (!blog) {
+      return next(createHttpError(404, "Blog not found"));
+    }
+
+    // Add the uploaded images to the blog
+    blog.image = blog.image ? [...blog.image, ...uploadResults] : uploadResults;
+    await blog.save();
+    res.status(201).json({ images: blog.image });
+  } catch (err) {
+    return next(createHttpError(500, "Error in uploading blog photos"));
+  }
+};
+
 export {
   createBlog,
   updateAblog,
@@ -186,4 +241,5 @@ export {
   getAllBlogs,
   likeBlog,
   dislikedBlog,
+  uploadBlogPhotos,
 };

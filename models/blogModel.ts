@@ -46,9 +46,8 @@ const blogSchema = new Schema<BlogModelTypes>(
       },
     ],
     image: {
-      type: String,
-      default:
-        "https://www.istockphoto.com/photo/blog-word-on-wooden-cube-blocks-on-gray-background-gm1440246683-480280906?utm_campaign=srp_photos_top&utm_content=https%3A%2F%2Funsplash.com%2Fs%2Fphotos%2Fblog&utm_medium=affiliate&utm_source=unsplash&utm_term=blog%3A%3A%3A",
+      type: Array,
+      default: [],
     },
     author: {
       type: String,

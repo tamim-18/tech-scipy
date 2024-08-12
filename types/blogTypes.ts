@@ -13,6 +13,6 @@ export interface BlogModelTypes {
   isDisliked?: boolean;
   likes?: Types.ObjectId[];
   dislikes?: Types.ObjectId[];
-  image?: string;
+  image?: Array<{ public_id: string; url: string }>;
   author?: string;
 }
