@@ -1,6 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
 import { config } from "./config";
-import e from "express";
 
 // Configuration
 cloudinary.config({

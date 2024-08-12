@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import sharp from "sharp";
 import path from "path";
 import fs from "fs";
-import { v2 as cloudinary } from "cloudinary";
+// import { v2 as cloudinary } from "cloudinary";
+import cloudinary from "../config/cloudinary_config";
 import createHttpError from "http-errors";
 import productModel from "../models/productModel";
 import { AuthRequest } from "../middlewares/authenticate";
@@ -256,6 +257,7 @@ const uploadPhotos = async (
 ) => {
   const { id } = req.params;
   const files = req.files as Express.Multer.File[];
+  //console.log(files);
 
   try {
     // Check if the product exists
@@ -263,7 +265,7 @@ const uploadPhotos = async (
       files.map(async (file) => {
         const outputPath = path.join(
           __dirname,
-          "../../public/data/uploads/resized",
+          "../public/data/uploads/resized",
           file.filename
         ); // Output path for resized file
         await sharp(file.path)
