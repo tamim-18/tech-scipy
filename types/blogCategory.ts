@@ -2,4 +2,7 @@
 
 export interface blogCategoryTypes {
   title: string;
+  //blog name
+  
+
 }
