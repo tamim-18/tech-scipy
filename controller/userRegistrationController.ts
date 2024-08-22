@@ -64,8 +64,61 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   res.status(201).json({ accessToken: token });
 };
 
-// user login
+// admin login
 
+const adminLogin = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+  //validate user
+  if (!email || !password) {
+    return next(createHttpError(400, "Please provide email and password"));
+  }
+  //check if user exists
+  try {
+    const user = await userModel.findOne({ email });
+    // console.log(user);
+    if (!user?.isAdmin) {
+      return next(createHttpError(401, "Invalid credentials"));
+    }
+    if (!user) {
+      return next(createHttpError(401, "Invalid credentials"));
+    }
+    //check if password is correct
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return next(createHttpError(401, "Invalid credentials"));
+    }
+
+    //toker generation using jwt
+    const token = sign({ sub: user._id }, config.jwtSecret as string, {
+      expiresIn: "7d",
+    });
+    //send response
+
+    //creating a cookie
+    const refreshToken = sign({ sub: user._id }, config.jwtSecret as string, {
+      expiresIn: "3d",
+    });
+    // update refresh token in db
+    const updatedUser = await userModel.findByIdAndUpdate(
+      user._id,
+      {
+        refreshToken: refreshToken,
+        // return updated user
+      },
+      { new: true }
+    );
+    //refresh token in cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({ accessToken: token });
+  } catch (err) {
+    return next(createHttpError(404, "User not found"));
+  }
+};
+
+//login user
 const userLogin = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   //validate user
@@ -406,7 +459,21 @@ const unblockUser = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(500, "Something went wrong"));
   }
 };
+const getWhistList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const _req = req as AuthRequest;
 
+  try {
+    const user = await userModel.findById(_req.userId).populate("whistlist");
+    res.json(user);
+
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
 export {
   createUser,
   userLogin,
@@ -421,4 +488,6 @@ export {
   updatePassword,
   forgetPasswordToken,
   resetPassword,
+  adminLogin,
+  getWhistList,
 };

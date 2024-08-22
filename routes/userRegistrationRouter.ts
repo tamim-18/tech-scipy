@@ -2,12 +2,14 @@
 
 import express from "express";
 import {
+  adminLogin,
   blockUser,
   createUser,
   deleteUser,
   forgetPasswordToken,
   getAllUsers,
   getSingleUser,
+  getWhistList,
   logoutUser,
   refreshToken,
   resetPassword,
@@ -22,6 +24,8 @@ const userRouter = express.Router();
 
 userRouter.post("/register", createUser);
 userRouter.post("/login", userLogin);
+//admin login
+userRouter.post("/admin-login", adminLogin);
 userRouter.get("/refresh-token", refreshToken);
 //change password
 userRouter.put("/change-password", authentication, updatePassword);
@@ -32,6 +36,7 @@ userRouter.put("/reset-password/:resetToken", resetPassword);
 userRouter.get("/logout", logoutUser);
 
 userRouter.get("/all-users", getAllUsers);
+userRouter.get("/whistList", authentication, getWhistList);
 
 //@ts-ignore
 userRouter.get("/:id", authentication, isAdmin, getSingleUser);
