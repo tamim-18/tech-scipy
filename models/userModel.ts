@@ -35,12 +35,9 @@ const userSchema = new mongoose.Schema<userModelTypes>(
       type: Array,
       default: [],
     },
-    address: [
-      {
-        type: ObjectId,
-        ref: "Address",
-      },
-    ],
+    address: {
+      type: String,
+    },
     whistlist: [
       {
         type: ObjectId,

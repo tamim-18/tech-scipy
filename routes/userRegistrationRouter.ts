@@ -13,6 +13,7 @@ import {
   logoutUser,
   refreshToken,
   resetPassword,
+  saveAddres,
   unblockUser,
   updatePassword,
   updateUser,
@@ -31,7 +32,7 @@ userRouter.get("/refresh-token", refreshToken);
 userRouter.put("/change-password", authentication, updatePassword);
 userRouter.post("/forgetPassword-token", forgetPasswordToken);
 userRouter.put("/reset-password/:resetToken", resetPassword);
-
+userRouter.put("/save-address", authentication, saveAddres);
 //logout user
 userRouter.get("/logout", logoutUser);
 

@@ -13,6 +13,7 @@ import { config } from "../config/config";
 import { AuthRequest } from "../middlewares/authenticate";
 import crypto from "crypto";
 import { sendMail } from "../middlewares/mailControl";
+import cartModel from "../models/cartModel";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //if user already exists
@@ -469,7 +470,42 @@ const getWhistList = async (
   try {
     const user = await userModel.findById(_req.userId).populate("whistlist");
     res.json(user);
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
 
+// save user address
+const saveAddres = async (req: Request, res: Response, next: NextFunction) => {
+  const _req = req as AuthRequest;
+
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      _req.userId,
+      {
+        address: req?.body?.address,
+      },
+      { new: true }
+    );
+    res.json(user);
+  } catch (err) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
+const userCart = async (req: Request, res: Response, next: NextFunction) => {
+  const _req = req as AuthRequest;
+  const { cart } = req.body;
+
+  try {
+    const user = await userModel.findById(_req.userId);
+    // chaeck if product is already in cart
+    const isProductInCart = await cartModel.findOne({
+      orderedBy: _req?.userId,
+    });
+    if (isProductInCart) {
+    }
+    // add product to cart
   } catch (err) {
     return next(createHttpError(500, "Something went wrong"));
   }
@@ -490,4 +526,5 @@ export {
   resetPassword,
   adminLogin,
   getWhistList,
+  saveAddres,
 };
