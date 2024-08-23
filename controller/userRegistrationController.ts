@@ -14,7 +14,8 @@ import { AuthRequest } from "../middlewares/authenticate";
 import crypto from "crypto";
 import { sendMail } from "../middlewares/mailControl";
 import cartModel from "../models/cartModel";
-
+import productModel from "../models/productModel";
+import { Types } from "mongoose";
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //if user already exists
 
@@ -492,24 +493,65 @@ const saveAddres = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(500, "Something went wrong"));
   }
 };
-
 const userCart = async (req: Request, res: Response, next: NextFunction) => {
-  const _req = req as AuthRequest;
   const { cart } = req.body;
+  const _req = req as AuthRequest;
+  console.log(cart);
 
   try {
+    let products: Array<{
+      product: Types.ObjectId;
+      count: number;
+      color: string;
+      price: number;
+    }> = [];
+    // Find user
     const user = await userModel.findById(_req.userId);
-    // chaeck if product is already in cart
-    const isProductInCart = await cartModel.findOne({
-      orderedBy: _req?.userId,
-    });
-    if (isProductInCart) {
+
+    // Check if the user already has a cart; if so, remove it
+    const existingCart = await cartModel.findOne({ orderedBy: user?._id });
+    if (existingCart) {
+      console.log("deleting existing cart");
+      await cartModel.deleteOne({ _id: existingCart._id }); // Delete the existing cart
     }
-    // add product to cart
+
+    // Add new products to the cart
+    for (let i = 0; i < cart.length; i++) {
+      let object: any = {}; // Initialize an empty object
+
+      object.product = cart[i]._id;
+      object.count = cart[i].count;
+      object.color = cart[i].color;
+
+      const getPrice = await productModel
+        .findById(cart[i]._id)
+        .select("price")
+        .exec(); //why exec() method is used here? because we need to execute the query
+      object.price = getPrice?.price; // Extract the price
+
+      products.push(object); // Add the object to the products array
+    }
+
+    // Calculate cart total
+    let cartTotal = 0;
+    for (let i = 0; i < products.length; i++) {
+      cartTotal += products[i].price * products[i].count;
+    }
+
+    // Create and save the new cart
+    const newCart = await new cartModel({
+      products, // Use "products" instead of "prdouct"
+      cartTotal,
+      orderedBy: user?._id,
+    }).save();
+    // why save() method is used here? because we need to save the cart in the database
+
+    res.json(newCart); // Return the newly created cart
   } catch (err) {
-    return next(createHttpError(500, "Something went wrong"));
+    return next(createHttpError(401, "Something went wrong"));
   }
 };
+
 export {
   createUser,
   userLogin,
@@ -527,4 +569,5 @@ export {
   adminLogin,
   getWhistList,
   saveAddres,
+  userCart,
 };

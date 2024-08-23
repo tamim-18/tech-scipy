@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { cartModelTypes } from "../types/cartModelTypes";
 
-const cartShema = new mongoose.Schema<cartModelTypes>(
+const cartSchema = new mongoose.Schema<cartModelTypes>(
   {
     products: [
       {
@@ -10,17 +10,30 @@ const cartShema = new mongoose.Schema<cartModelTypes>(
           ref: "Product",
           required: true,
         },
-        count: Number,
-        color: String,
+        count: {
+          type: Number,
+          required: true,
+        },
+        color: {
+          type: String,
+          required: true,
+        },
       },
     ],
-    cartTotal: Number,
-    totalAfterDiscount: Number,
-    orderedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    cartTotal: {
+      type: Number,
+      required: true,
+    },
+    totalAfterDiscount: Number, // This field is optional
+    orderedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model<cartModelTypes>("Cart", cartShema);
+export default mongoose.model<cartModelTypes>("Cart", cartSchema);

@@ -17,6 +17,7 @@ import {
   unblockUser,
   updatePassword,
   updateUser,
+  userCart,
   userLogin,
 } from "../controller/userRegistrationController";
 import { authentication, isAdmin } from "../middlewares/authenticate";
@@ -53,7 +54,7 @@ userRouter.put("/block-user/:id", authentication, isAdmin, blockUser);
 //unblock user
 //@ts-ignore
 userRouter.put("/unblock-user/:id", authentication, isAdmin, unblockUser);
-
+userRouter.put("/add-to-cart", authentication, userCart);
 // authenticating the refresh token
 
 export default userRouter;
