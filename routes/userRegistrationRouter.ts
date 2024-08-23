@@ -9,6 +9,7 @@ import {
   forgetPasswordToken,
   getAllUsers,
   getSingleUser,
+  getUserCart,
   getWhistList,
   logoutUser,
   refreshToken,
@@ -39,7 +40,7 @@ userRouter.get("/logout", logoutUser);
 
 userRouter.get("/all-users", getAllUsers);
 userRouter.get("/whistList", authentication, getWhistList);
-
+userRouter.get("/cart", authentication, getUserCart);
 //@ts-ignore
 userRouter.get("/:id", authentication, isAdmin, getSingleUser);
 userRouter.delete("/:id", deleteUser);
