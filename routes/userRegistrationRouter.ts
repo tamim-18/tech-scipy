@@ -1,8 +1,9 @@
 // creating user registration router
 
-import express from "express";
+import express, { application } from "express";
 import {
   adminLogin,
+  applyCouponToUserCart,
   blockUser,
   createUser,
   deleteUser,
@@ -63,5 +64,8 @@ userRouter.put("/add-to-cart", authentication, userCart);
 // delete cart
 userRouter.delete("/empty-cart", authentication, emptyCart);
 //buggy empty-cart
+
+// apply coupon
+userRouter.post("/cart/appy-coupon", authentication, applyCouponToUserCart);
 
 export default userRouter;

@@ -16,6 +16,7 @@ import { sendMail } from "../middlewares/mailControl";
 import cartModel from "../models/cartModel";
 import productModel from "../models/productModel";
 import { Types } from "mongoose";
+import couponModel from "../models/couponModel";
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //if user already exists
 
@@ -572,6 +573,38 @@ const emptyCart = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(401, "Something went wrong"));
   }
 };
+const applyCouponToUserCart = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { coupon } = req.body;
+  const _req = req as AuthRequest;
+  try {
+    const validCoupon = await couponModel.findOne({ name: coupon });
+    console.log(validCoupon);
+    if (!validCoupon) {
+      return next(createHttpError(400, "Invalid coupon"));
+    }
+    const user = await userModel.findById(_req.userId);
+    //@ts-ignore
+    const { products, cartTotal } = await cartModel
+      .findOne({
+        orderedBy: user?._id,
+      })
+      .populate("products.product");
+    const totalAfterDiscount =
+      cartTotal - (cartTotal * validCoupon.discount) / 100;
+    await cartModel.findOneAndUpdate(
+      { orderedBy: user?._id },
+      { totalAfterDiscount },
+      { new: true }
+    );
+    res.json({ totalAfterDiscount });
+  } catch (err) {
+    return next(createHttpError(401, "Something went wrong"));
+  }
+};
 
 export {
   createUser,
@@ -593,4 +626,5 @@ export {
   userCart,
   getUserCart,
   emptyCart,
+  applyCouponToUserCart,
 };

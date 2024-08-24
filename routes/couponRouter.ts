@@ -12,7 +12,7 @@ const couponRouter = Router();
 // create coupon
 couponRouter
   .post("/", authentication, isAdmin, createCoupon)
-  .get("/", authentication, isAdmin, getAllCoupons)
+  .get("/", authentication, getAllCoupons)
   .put("/:id", authentication, isAdmin, updateACoupon)
   .delete("/:id", authentication, isAdmin, deleteCoupon);
 
