@@ -6,6 +6,7 @@ import {
   blockUser,
   createUser,
   deleteUser,
+  emptyCart,
   forgetPasswordToken,
   getAllUsers,
   getSingleUser,
@@ -44,6 +45,7 @@ userRouter.get("/cart", authentication, getUserCart);
 //@ts-ignore
 userRouter.get("/:id", authentication, isAdmin, getSingleUser);
 userRouter.delete("/:id", deleteUser);
+
 userRouter.put("/update-user", authentication, updateUser);
 //get admin
 //@ts-ignore
@@ -57,5 +59,9 @@ userRouter.put("/block-user/:id", authentication, isAdmin, blockUser);
 userRouter.put("/unblock-user/:id", authentication, isAdmin, unblockUser);
 userRouter.put("/add-to-cart", authentication, userCart);
 // authenticating the refresh token
+
+// delete cart
+userRouter.delete("/empty-cart", authentication, emptyCart);
+//buggy empty-cart
 
 export default userRouter;

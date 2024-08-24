@@ -562,6 +562,16 @@ const getUserCart = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(401, "Something went wrong"));
   }
 };
+const emptyCart = async (req: Request, res: Response, next: NextFunction) => {
+  const _req = req as AuthRequest;
+  console.log(_req.userId);
+  try {
+    const cart = await cartModel.findOneAndDelete({ orderedBy: _req.userId });
+    res.json(cart);
+  } catch (err) {
+    return next(createHttpError(401, "Something went wrong"));
+  }
+};
 
 export {
   createUser,
@@ -582,4 +592,5 @@ export {
   saveAddres,
   userCart,
   getUserCart,
+  emptyCart,
 };
