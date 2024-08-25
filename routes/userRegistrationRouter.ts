@@ -5,6 +5,7 @@ import {
   adminLogin,
   applyCouponToUserCart,
   blockUser,
+  createOrder,
   createUser,
   deleteUser,
   emptyCart,
@@ -67,5 +68,6 @@ userRouter.delete("/empty-cart", authentication, emptyCart);
 
 // apply coupon
 userRouter.post("/cart/appy-coupon", authentication, applyCouponToUserCart);
-
+//create orderd
+userRouter.post("/cart/cash-order", authentication, createOrder);
 export default userRouter;
