@@ -11,6 +11,7 @@ import {
   emptyCart,
   forgetPasswordToken,
   getAllUsers,
+  getOrders,
   getSingleUser,
   getUserCart,
   getWhistList,
@@ -43,9 +44,11 @@ userRouter.get("/logout", logoutUser);
 
 userRouter.get("/all-users", getAllUsers);
 userRouter.get("/whistList", authentication, getWhistList);
+userRouter.get("/get-orders", authentication, getOrders);
 userRouter.get("/cart", authentication, getUserCart);
 //@ts-ignore
 userRouter.get("/:id", authentication, isAdmin, getSingleUser);
+userRouter.delete("/empty-cart", authentication, emptyCart);
 userRouter.delete("/:id", deleteUser);
 
 userRouter.put("/update-user", authentication, updateUser);
@@ -63,11 +66,12 @@ userRouter.put("/add-to-cart", authentication, userCart);
 // authenticating the refresh token
 
 // delete cart
-userRouter.delete("/empty-cart", authentication, emptyCart);
+
 //buggy empty-cart
 
 // apply coupon
 userRouter.post("/cart/appy-coupon", authentication, applyCouponToUserCart);
 //create orderd
 userRouter.post("/cart/cash-order", authentication, createOrder);
+
 export default userRouter;

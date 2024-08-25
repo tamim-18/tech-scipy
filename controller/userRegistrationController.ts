@@ -648,9 +648,33 @@ const createOrder = async (req: Request, res: Response, next: NextFunction) => {
       //@ts-ignore
       bulkOption,
       {}
-    );
+    ); // Update the product quantity and sold count
+
+    // instead of using bulkWrite, we can also use the following code:
+
+    // for (let item of userCart?.products || []) {
+    //   await productModel.updateOne(
+    //     { _id: item.product._id },
+    //     {
+    //       $inc: { quantity: -item.count, sold: +item.count },
+    //     }
+    //   );
+    // }
+
     res.json({ ok: true });
   } catch (err) {
+    return next(createHttpError(401, "Something went wrong"));
+  }
+};
+const getOrders = async (req: Request, res: Response, next: NextFunction) => {
+  const _req = req as AuthRequest;
+  try {
+    const user = await userModel.findById(_req.userId);
+    const orders = await orderModel
+      .find({ orderedBy: user?._id })
+      .populate("products.product");
+    res.json(orders);
+  } catch (error) {
     return next(createHttpError(401, "Something went wrong"));
   }
 };
@@ -677,4 +701,5 @@ export {
   emptyCart,
   applyCouponToUserCart,
   createOrder,
+  getOrders,
 };
