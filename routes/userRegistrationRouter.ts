@@ -20,6 +20,7 @@ import {
   resetPassword,
   saveAddres,
   unblockUser,
+  updateOrderStatus,
   updatePassword,
   updateUser,
   userCart,
@@ -59,6 +60,7 @@ userRouter.get("/admin", authentication, isAdmin);
 //block user
 //@ts-ignore
 userRouter.put("/block-user/:id", authentication, isAdmin, blockUser);
+userRouter.put("/update-order/:id", authentication, isAdmin, updateOrderStatus);
 //unblock user
 //@ts-ignore
 userRouter.put("/unblock-user/:id", authentication, isAdmin, unblockUser);

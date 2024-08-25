@@ -678,7 +678,30 @@ const getOrders = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(401, "Something went wrong"));
   }
 };
+const updateOrderStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { orderStatus } = req.body;
+  const { id } = req.params;
 
+  try {
+    const order = await orderModel.findByIdAndUpdate(
+      id,
+      {
+        orderStatus: orderStatus,
+        paymentIntent: {
+          status: orderStatus, // Update the payment status
+        },
+      },
+      { new: true }
+    );
+    res.json(order);
+  } catch (error) {
+    return next(createHttpError(401, "Something went wrong"));
+  }
+};
 export {
   createUser,
   userLogin,
@@ -702,4 +725,5 @@ export {
   applyCouponToUserCart,
   createOrder,
   getOrders,
+  updateOrderStatus,
 };
